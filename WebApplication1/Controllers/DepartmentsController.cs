@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Mapster;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication1.Data;
+using WebApplication1.DTO.Departments;
 using WebApplication1.Models;
 
 namespace WebApplication1.Controllers
@@ -15,8 +17,10 @@ namespace WebApplication1.Controllers
         [HttpGet]
         public IActionResult GetDepartments()
         {
+
             var departments = context.Department.ToList();
-            return Ok(departments);
+            var departmentsDTO = departments.Adapt<List<DepartmentDTO>>();
+            return Ok(departmentsDTO);
         }
         // GET: api/Departments/5
         [HttpGet("{id}")]
@@ -31,13 +35,14 @@ namespace WebApplication1.Controllers
         }
         // POST: api/Departments
         [HttpPost]
-        public IActionResult Create(Departments request)
+        public IActionResult Create(CreateDepartmentDTO requestDTO)
         {
-            if (request == null)
+            if (requestDTO == null)
             {
                 return BadRequest("Department cannot be null");
             }
-            context.Department.Add(request);
+            var department = requestDTO.Adapt<Departments>();
+            context.Department.Add(department);
             context.SaveChanges();
             return Ok();
         }

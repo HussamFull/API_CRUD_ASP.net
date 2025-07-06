@@ -6,7 +6,8 @@ namespace WebApplication1.Data
     public class ApplicationDbContext : DbContext
     {
         public DbSet<Departments> Department { get; set; }
-
+        public DbSet<Employee> Employees { get; set; }
+        public object Employee { get; internal set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

@@ -6,15 +6,12 @@
         public string DepartmentName { get; set; }
         public string Location { get; set; }
         public string Manager { get; set; }
-        //public int EmployeeCount { get; set; }
-        //// Constructor
-        //public Departments(int departmentId, string departmentName, string location, string manager, int employeeCount)
-        //{
-        //    DepartmentId = departmentId;
-        //    DepartmentName = departmentName;
-        //    Location = location;
-        //    Manager = manager;
-        //    EmployeeCount = employeeCount;
-        //}
+
+        // Navigation property for related employees
+        public ICollection<Employee> Employees { get; set; } = new List<Employee>();
+
+
+
+
     }
 }
