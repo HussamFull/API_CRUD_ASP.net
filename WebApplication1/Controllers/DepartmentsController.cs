@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using WebApplication1.Data;
 using WebApplication1.DTO.Departments;
 using WebApplication1.Models;
+using System.Linq; // <<<< أضف هذا السطر هنا
+
 
 namespace WebApplication1.Controllers
 {
@@ -13,7 +15,7 @@ namespace WebApplication1.Controllers
     {
         ApplicationDbContext context = new ApplicationDbContext();
 
-        // GET: api/Departments
+        // GET:Departments
         [HttpGet]
         public IActionResult GetDepartments()
         {
@@ -22,7 +24,11 @@ namespace WebApplication1.Controllers
             var departmentsDTO = departments.Adapt<List<DepartmentDTO>>();
             return Ok(departmentsDTO);
         }
-        // GET: api/Departments/5
+
+
+
+
+        // GET: Details 
         [HttpGet("{id}")]
         public IActionResult GetDepartment(int id)
         {
@@ -33,7 +39,10 @@ namespace WebApplication1.Controllers
             }
             return Ok(department);
         }
-        // POST: api/Departments
+
+
+
+        // POST: Create 
         [HttpPost]
         public IActionResult Create(CreateDepartmentDTO requestDTO)
         {
@@ -47,34 +56,58 @@ namespace WebApplication1.Controllers
             return Ok();
         }
 
-        // PUT: api/Departments/5
+
+
+
+        // PUT: Update 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, Departments request)
+        public IActionResult Update(int id, UpdateDepartmentDTO requestDTO)
         {
-           
+            // 1. Find the existing department in the database
             var department = context.Department.Find(id);
+            // 2. Check if the department exists
             if (department == null)
             {
                 return NotFound();
             }
-            department.DepartmentName = request.DepartmentName;
-            department.Location = request.Location;
-            department.Manager = request.Manager;
+            // 3. Update the properties of the found department with values from the DTO
+            department.DepartmentName = requestDTO.DepartmentName;
+            department.Location = requestDTO.Location;
+            department.Manager = requestDTO.Manager;
+            context.Department.Update(department); 
             context.SaveChanges();
+            // 5. Return the updated department (or a success message)
             return Ok(department);
         }
-        // DELETE: api/Departments/5
+
+
+
+
+        // DELETE:
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
             var department = context.Department.Find(id);
+
             if (department == null)
             {
                 return NotFound();
             }
+
+            // (جديد) جلب الموظفين المرتبطين وتعديلهم
+            // تأكد أن Employee موجود كـ DbSet في ApplicationDbContext
+            var employeesInDepartment = context.Employees.Where(e => e.DepartmentId == id).ToList();
+
+            foreach (var employee in employeesInDepartment)
+            {
+                // تأكد أن DepartmentId في نموذج Employee هو int? (nullable)
+                employee.DepartmentId = null;
+            }
+
             context.Department.Remove(department);
-            context.SaveChanges();
-            return Ok();
+            context.SaveChanges(); // سيتم حفظ تحديثات الموظفين وحذف القسم هنا
+
+            return Ok("Department deleted, associated employees updated.");
         }
     }
 }

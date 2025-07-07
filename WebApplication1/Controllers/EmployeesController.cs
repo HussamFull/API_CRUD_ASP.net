@@ -14,7 +14,7 @@ namespace WebApplication1.Controllers
 
         ApplicationDbContext context = new ApplicationDbContext();
 
-        // GET: api/Employees
+        // GET: Employees
         [HttpGet]
         public IActionResult GetEmployees()
         {
@@ -22,7 +22,9 @@ namespace WebApplication1.Controllers
             var employeesDTO = employees.Adapt<List<EmployeesDTO>>();
             return Ok(employeesDTO);
         }
-        // GET: api/Departments/5
+
+
+        // GET: Details 
         [HttpGet("{id}")]
         public IActionResult GetEmployee(int id)
         {
@@ -33,7 +35,10 @@ namespace WebApplication1.Controllers
             }
             return Ok(employees);
         }
-        // POST: api/Employees
+
+
+
+        // POST: Create /Employees
         [HttpPost]
         public IActionResult Create(CreateEmployeeDTO requestDTO)
         {
@@ -47,9 +52,11 @@ namespace WebApplication1.Controllers
             return Ok();
         }
 
-        // PUT: api/Departments/5
+
+
+        // PUT: Update Employees
         [HttpPut("{id}")]
-        public IActionResult Update(int id, Employee request)
+        public IActionResult Update(int id, UpdateEmployeeDTO requestDTO)
         {
 
             var employee = context.Employees.Find(id);
@@ -57,12 +64,16 @@ namespace WebApplication1.Controllers
             {
                 return NotFound();
             }
-            employee.Name = request.Name;
-            employee.Position = request.Position;
-            employee.Salary = request.Salary;
+             
+            employee.Name = requestDTO.Name;
+            employee.Position = requestDTO.Position;
+            employee.Salary = requestDTO.Salary;
             context.SaveChanges();
             return Ok(employee);
         }
+
+
+
         // DELETE: api/Departments/5
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
